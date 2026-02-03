@@ -8,7 +8,7 @@ int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout<<"MTF shell v1.0 (C)\n";
-    cout<<"Type 'help' for help , type 'exit' to exit.pleas found a mod first!\n\n";
+    cout<<"Type 'help' for help , type 'exit' to exit.Pleas found a mod first!\n\n";
     while(true){
         cout<<"MTF> ";
         cin>>in;
