@@ -7,10 +7,10 @@ string name;
 int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
-    cout<<"\033[32mMTF shell v1.0 (C)\033[0m\n";
+    cout<<"\033[32mMFT shell v1.0 (C)\033[0m\n";
     cout<<"\033[32mType 'help' for help , type 'exit' to exit.Pleas found a mod first!\n\n\033[0m";
     while(true){
-        cout<<"\033[34mMTF> \033[0m";
+        cout<<"\033[34mMFT> \033[0m";
         cin>>in;
         if(in=="help" || in=="h" || in=="?" || in=="H" || in=="Help" || in=="HELP"){
             cout<<"fd-mod {name:\" \",des:\" \"}  --- to found a mod";
