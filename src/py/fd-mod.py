@@ -9,7 +9,7 @@ def _main_():
     par=sys.argv[1]
     size=len(par)
     for i in range(1):
-        nameStart = par.find("name=")+5
+        nameStart = par.find("name=\"")+6
         for j in range(nameStart,size):
             if par[j]=='"':
                 nameEnd = j
@@ -17,7 +17,7 @@ def _main_():
         name = par[nameStart:nameEnd]
         print("mod name: "+name+'\n')
             
-        desStart = par.find("des=")+4
+        desStart = par.find("des=\"")+5
         for j in range(desStart,size):
             if par[j]=='"':
                 desEnd = j
@@ -54,13 +54,9 @@ def _main_():
             }
             ''')
             file.close()
-        os.makedirs(name+"/textures")
-        os.makedirs(name+"/entities")
-        os.makedirs(name+"/blocks")
-        os.makedirs(name+"/recipes")
-        os.makedirs(name+"/functions")
-        os.makedirs(name+"/loot_tables")
-        os.makedirs(name+"/spawn_rules")
+        os.makedirs(name+"/textures/blocks")
+        os.makedirs(name+"/models/block")
+        os.makedirs(name+"/texts")
         return "name:"+name
 
 _main_()
