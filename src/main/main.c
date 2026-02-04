@@ -8,13 +8,18 @@ int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout<<"\033[32mMFT shell v1.0 (C)\033[0m\n";
-    cout<<"\033[32mType 'help' for help , type 'exit' to exit.Pleas found a mod first!\n\n\033[0m";
+    cout<<"\033[32mType 'help' for help , type 'exit' to exit.Pleas found a mod first!\n\033[0m";
+    cout<<"notice:"<<"\n";
+    cout<<"1. Icon do not add \'.png\'"<<"\n";
+    cout<<"2. Put the texture file in the appropriate subfolders inside \'textures/*\'";
+    cout<<"\n\n";
+    
     while(true){
         cout<<"\033[34mMFT> \033[0m";
         cin>>in;
         if(in=="help" || in=="h" || in=="?" || in=="H" || in=="Help" || in=="HELP"){
             cout<<"fd-mod {name:\" \",des:\" \"}  --- to found a mod";
-            cout<<"fd-mod-block {name:\" \",des:\" \",icon:\" \"}  --- to found a mod block";
+            cout<<"fd-mod-block {name:\" \",des:\" \",icon:\" \"}  --- to found a mod block. Icon do not add \'.png\'";
         }
         else if(in=="exit" || in=="quit" || in=="EXIT" || in=="QUIT"){
             break;
