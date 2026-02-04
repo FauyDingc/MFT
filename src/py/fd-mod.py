@@ -15,16 +15,16 @@ def _main_():
                 nameEnd = j
                 break
         name = par[nameStart:nameEnd]
-        print("mod name: "+name)
+        print("mod name: "+name+'\n')
             
-        desStart = par.find("des=")+5
+        desStart = par.find("des=")+4
         for j in range(desStart,size):
             if par[j]=='"':
                 desEnd = j
                 break
         des = par[desStart:desEnd]
 
-        print("mod des: "+des)
+        print("mod des: "+des+'\n')
 
         os.system("mkdir "+name)
         with open(name+"/manifest.json","w") as file:

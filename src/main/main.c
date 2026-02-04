@@ -33,6 +33,7 @@ int main(){
                 name = result; 
             }
             else{
+                in=in+"/;name="+name+";/";
                 system(in.c_str());
             }
         }
