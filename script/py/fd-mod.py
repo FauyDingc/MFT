@@ -2,6 +2,8 @@ import os
 import sys
 import uuid
 
+sys.stdout.flush()
+
 def _main_():
     print("Founding mod...")
     

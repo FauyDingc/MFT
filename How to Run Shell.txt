@@ -1,0 +1,1 @@
+cp MFTShell.elf /tmp/MFTShell.elf && chmod +x /tmp/MFTShell.elf && /tmp/MFTShell.elf

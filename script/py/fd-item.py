@@ -2,6 +2,8 @@ import os
 import sys
 import json
 
+sys.stdout.flush()
+
 def _main_():
     print("Creating item...")
 

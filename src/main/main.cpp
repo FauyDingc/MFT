@@ -37,6 +37,9 @@ int main(){
     if(access(py_path.c_str(), F_OK) != 0){
         py_path = program_path + "/../../script/py/";
     }
+    if(access(py_path.c_str(), F_OK) != 0){
+        py_path = "/media/ljz/LJZ/MFT/script/py/";
+    }
     // ---------看看py脚本在何处
 
     cout << "\033[32mMFT shell v1.0 (C)\033[0m\n";
@@ -78,6 +81,7 @@ int main(){
             cout << "exit/quit  --- to exit the program\n";
         }
         else if(cmd_lower == "exit" || cmd_lower == "quit"){
+            cout<<'\n';//后面发现直接推出终端不会换行，加了一句
             break;
         }
         else if(cmd_lower == "fd-mod"){
@@ -88,7 +92,7 @@ int main(){
             }
             
             // 传参给Python脚本
-            string full_cmd = "python3 \"" + py_path + "fd-mod.py\" " + params;
+            string full_cmd = "python3 -u \"" + py_path + "fd-mod.py\" " + params;
             FILE* pipe = popen(full_cmd.c_str(), "r");
             if(pipe){
                 char buffer[4096];
@@ -121,7 +125,7 @@ int main(){
             }
             
             // 依旧传参
-            string full_cmd = "python3 \"" + py_path + "fd-block.py\" " + params + ";name=" + name + ";";
+            string full_cmd = "python3 -u \"" + py_path + "fd-block.py\" " + params + ";name=" + name + ";";
             FILE* pipe = popen(full_cmd.c_str(), "r");
             if(pipe){
                 char buffer[4096];
@@ -146,7 +150,7 @@ int main(){
             }
             
             // 传递参数给Python脚本，添加mod名称
-            string full_cmd = "python3 \"" + py_path + "fd-item.py\" " + params + ";name=" + name + ";";
+            string full_cmd = "python3 -u \"" + py_path + "fd-item.py\" " + params + ";name=" + name + ";";
             FILE* pipe = popen(full_cmd.c_str(), "r");
             if(pipe){
                 char buffer[4096];
