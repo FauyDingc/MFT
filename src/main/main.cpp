@@ -33,17 +33,16 @@ int main(){
     string program_path = get_program_path();
     
     // 计算Python脚本的绝对路径（无论从哪个目录运行都能找到）
-    string py_path = program_path + "/../src/py/";
-    
-    // 如果在src/main目录下运行，需要使用上级的src目录
+    string py_path = program_path + "/../script/py/";
+
     // 检查路径是否存在，如果不存在则尝试其他路径
     if(access(py_path.c_str(), F_OK) != 0){
         // 尝试从项目根目录运行的情况
-        py_path = program_path + "/src/py/";
+        py_path = program_path + "/script/py/";
     }
     if(access(py_path.c_str(), F_OK) != 0){
         // 尝试直接使用当前工作目录
-        py_path = program_path + "/../../src/py/";
+        py_path = program_path + "/../../script/py/";
     }
     
     cout << "\033[32mMFT shell v1.0 (C)\033[0m\n";
