@@ -2,15 +2,16 @@ import os
 import sys
 import uuid
 
-uuid1 = uuid.uuid4()
-uuid2 = uuid.uuid4()
-
 def _main_():
     print("Founding mod...")
     
     if len(sys.argv) < 2:
         print("Error: No arguments provided!")
         return
+    
+    # 在函数内部生成UUID，确保每次调用都生成新的UUID
+    uuid1 = uuid.uuid4()
+    uuid2 = uuid.uuid4()
     
     par = sys.argv[1]
     size = len(par)
@@ -44,7 +45,11 @@ def _main_():
     # 创建模组目录结构
     try:
         os.makedirs(name + "/textures/blocks", exist_ok=True)
+        os.makedirs(name + "/textures/items", exist_ok=True)
         os.makedirs(name + "/models/block", exist_ok=True)
+        os.makedirs(name + "/models/items", exist_ok=True)
+        os.makedirs(name + "/blocks", exist_ok=True)
+        os.makedirs(name + "/items", exist_ok=True)
         os.makedirs(name + "/texts", exist_ok=True)
         os.makedirs(name + "/scripts", exist_ok=True)
     except Exception as e:
@@ -85,10 +90,10 @@ def _main_():
         return
     
     # 创建基础mod脚本
-    script_content = '''// Mod: ''' + name + '''
-// Description: ''' + des + '''
+    script_content = f'''// Mod: {name}
+// Description: {des}
 
-console.log("Mod ''' + name + ''' loaded!");
+console.log("Mod {name} loaded!");
 '''
     
     try:
@@ -99,8 +104,17 @@ console.log("Mod ''' + name + ''' loaded!");
         print(f"Error writing mod.js: {e}")
         return
     
+    # 创建初始语言文件
+    try:
+        with open(name + "/texts/zh_CN.lang", "w", encoding='utf-8') as file:
+            file.write(f"mod.name={name}\n")
+            file.write(f"mod.description={des}\n")
+        print("Language file created successfully!")
+    except Exception as e:
+        print(f"Error writing language file: {e}")
+        return
+    
     print("name:" + name)
 
 if __name__ == "__main__":
     _main_()
-

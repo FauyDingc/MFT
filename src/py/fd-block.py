@@ -1,6 +1,6 @@
 import os
 import sys
-
+import json
 def _main_():
     print("Founding block...")
     
@@ -62,7 +62,41 @@ def _main_():
             break
     icon = par[iconStart:iconEnd]
     print("block icon: " + icon)
-    
+
+    # 解析可选参数：爆炸抗性、发光等级
+    explosion_resistance = 1.0
+    light_level = 0
+
+    # 检查爆炸抗性参数
+    expStart = par.find("explosion=\"") + 11
+    if expStart != 10:
+        for j in range(expStart, size):
+            if par[j] == '"':
+                expEnd = j
+                break
+        try:
+            explosion_resistance = float(par[expStart:expEnd])
+            print("explosion resistance: " + str(explosion_resistance))
+        except ValueError:
+            print("Warning: Invalid explosion resistance value, using default 1.0")
+
+    # 检查发光等级参数
+    lightStart = par.find("light=\"") + 7
+    if lightStart != 6:
+        for j in range(lightStart, size):
+            if par[j] == '"':
+                lightEnd = j
+                break
+        try:
+            light_level = int(par[lightStart:lightEnd])
+            if light_level < 0 or light_level > 15:
+                print("Warning: Light level must be between 0-15, using 0")
+                light_level = 0
+            else:
+                print("light level: " + str(light_level))
+        except ValueError:
+            print("Warning: Invalid light level value, using default 0")
+
     # 创建纹理JSON文件
     textures_path = mod_name + "/textures/blocks"
     try:
@@ -99,22 +133,29 @@ def _main_():
         print(f"Error creating blocks directory: {e}")
         return
     
-    block_content = f'''{{
-    "format_version": "1.16.0",
-    "minecraft:block": {{
-        "description": {{
-            "identifier": "{mod_name}:{name}",
-            "is_experimental": false,
-            "register_to_creative_menu": true
-        }},
-        "components": {{
-            "minecraft:destroy_time": 1.5,
-            "minecraft:explosion_resistance": 1.0,
-            "minecraft:friction": 0.6,
-            "minecraft:map_color": "{icon}"
-        }}
-    }}
-}}'''
+    # 创建方块定义JSON文件
+    block_data = {
+        "format_version": "1.16.0",
+        "minecraft:block": {
+            "description": {
+                "identifier": f"{mod_name}:{name}",
+                "is_experimental": False,
+                "register_to_creative_menu": True
+            },
+            "components": {
+                "minecraft:destroy_time": 1.5,
+                "minecraft:explosion_resistance": explosion_resistance,
+                "minecraft:friction": 0.6,
+                "minecraft:map_color": icon
+            }
+        }
+    }
+
+    # 添加发光组件（如果发光等级大于0）
+    if light_level > 0:
+        block_data["minecraft:block"]["components"]["minecraft:light_emission"] = light_level
+
+    block_content = json.dumps(block_data, indent=4, ensure_ascii=False)
     
     try:
         with open(blocks_path + "/" + name + ".json", "w") as file:
