@@ -11,9 +11,9 @@ def _main_():
     par = sys.argv[1]
     size = len(par)
     
-    # 解析mod名称（从参数末尾获取）
+    # 获取shell的传参
     mod_name_Start = par.find("/;name=") + 7
-    if mod_name_Start == 6:  # 没有找到";name="
+    if mod_name_Start == 6:  #这要是错了就是shell传参的问题了
         print("Error: mod name not found in parameters!")
         return
     
@@ -23,10 +23,9 @@ def _main_():
             break
     mod_name = par[mod_name_Start:mod_nameEnd]
     print("mod name: " + mod_name)
-    
-    # 解析方块名称
+   
     nameStart = par.find("name=\"") + 6
-    if nameStart == 5:  # 没有找到name="
+    if nameStart == 5:  # 方块名称->die
         print("Error: name parameter not found!")
         return
     
@@ -37,9 +36,8 @@ def _main_():
     name = par[nameStart:nameEnd]
     print("block name: " + name)
     
-    # 解析方块描述
     desStart = par.find("des=\"") + 5
-    if desStart == 4:  # 没有找到des="
+    if desStart == 4:  # 方块描述->die too
         print("Error: des parameter not found!")
         return
     
@@ -50,9 +48,8 @@ def _main_():
     des = par[desStart:desEnd]
     print("block des: " + des)
     
-    # 解析图标名称
     iconStart = par.find("icon=\"") + 6
-    if iconStart == 5:  # 没有找到icon="
+    if iconStart == 5:  # 方块纹理->die tooooo
         print("Error: icon parameter not found!")
         return
     
@@ -67,7 +64,7 @@ def _main_():
     explosion_resistance = 1.0
     light_level = 0
 
-    # 检查爆炸抗性参数
+    # 看看有没有传过来
     expStart = par.find("explosion=\"") + 11
     if expStart != 10:
         for j in range(expStart, size):
@@ -80,7 +77,7 @@ def _main_():
         except ValueError:
             print("Warning: Invalid explosion resistance value, using default 1.0")
 
-    # 检查发光等级参数
+    # 看看发光等级有没有传过来:)
     lightStart = par.find("light=\"") + 7
     if lightStart != 6:
         for j in range(lightStart, size):
@@ -97,7 +94,7 @@ def _main_():
         except ValueError:
             print("Warning: Invalid light level value, using default 0")
 
-    # 创建纹理JSON文件
+    # 创建文件
     textures_path = mod_name + "/textures/blocks"
     try:
         os.makedirs(textures_path, exist_ok=True)
@@ -125,7 +122,7 @@ def _main_():
         print(f"Error writing texture JSON: {e}")
         return
     
-    # 创建方块定义JSON文件
+  
     blocks_path = mod_name + "/blocks"
     try:
         os.makedirs(blocks_path, exist_ok=True)
@@ -133,7 +130,7 @@ def _main_():
         print(f"Error creating blocks directory: {e}")
         return
     
-    # 创建方块定义JSON文件
+    
     block_data = {
         "format_version": "1.16.0",
         "minecraft:block": {
@@ -151,7 +148,6 @@ def _main_():
         }
     }
 
-    # 添加发光组件（如果发光等级大于0）
     if light_level > 0:
         block_data["minecraft:block"]["components"]["minecraft:light_emission"] = light_level
 
@@ -165,7 +161,7 @@ def _main_():
         print(f"Error writing block definition: {e}")
         return
     
-    # 创建语言文件
+    # 更新语言文件
     try:
         with open(mod_name + "/texts/zh_CN.lang", "a") as file:
             file.write(f"tile.{mod_name}:{name}.name={name}\n")
@@ -180,3 +176,5 @@ def _main_():
 if __name__ == "__main__":
     _main_()
 
+
+#为了追加参数更方便具体的json配置就分开来了

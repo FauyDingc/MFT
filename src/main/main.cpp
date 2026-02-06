@@ -1,12 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// 获取程序所在目录的绝对路径
-string get_program_path() {
+string get_program_path() {//获取运行目录（写的难受丢给GPT写的）
     char result[PATH_MAX];
     ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
     string path = (count != -1) ? string(result, count) : "";
-    // 获取目录部分
     size_t pos = path.find_last_of("/");
     if (pos != string::npos) {
         return path.substr(0, pos);
@@ -14,8 +12,7 @@ string get_program_path() {
     return ".";
 }
 
-// 去除字符串两端空格
-string trim(const string& str) {
+string trim(const string& str) {//去空格，没什么用，以防万一
     size_t start = str.find_first_not_of(" \t\n\r");
     if (start == string::npos) return "";
     size_t end = str.find_last_not_of(" \t\n\r");
@@ -29,22 +26,19 @@ int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    // 获取程序所在目录
     string program_path = get_program_path();
     
-    // 计算Python脚本的绝对路径（无论从哪个目录运行都能找到）
+    // --------
     string py_path = program_path + "/../script/py/";
 
-    // 检查路径是否存在，如果不存在则尝试其他路径
     if(access(py_path.c_str(), F_OK) != 0){
-        // 尝试从项目根目录运行的情况
         py_path = program_path + "/script/py/";
     }
     if(access(py_path.c_str(), F_OK) != 0){
-        // 尝试直接使用当前工作目录
         py_path = program_path + "/../../script/py/";
     }
-    
+    // ---------看看py脚本在何处
+
     cout << "\033[32mMFT shell v1.0 (C)\033[0m\n";
     cout << "\033[32mPython scripts path: " << py_path << "\033[0m\n";
     cout << "\033[32mType 'help' for help, type 'exit' to exit. Please create a mod first!\n\033[0m";
@@ -54,19 +48,16 @@ int main(){
     
     while(true){
         cout << "\033[34mMFT> \033[0m";
-        // 使用getline读取完整命令（包括参数）
         getline(cin, in);
         
-        // 去除首尾空格
         in = trim(in);
         
         if(in.empty()) continue;
         
-        // 解析命令名和参数
         string cmd_name = "";
         string params = "";
         
-        // 提取命令名（第一个单词）
+        //提取参数（单词）
         size_t space_pos = in.find(' ');
         if(space_pos != string::npos){
             cmd_name = in.substr(0, space_pos);
@@ -75,10 +66,11 @@ int main(){
             cmd_name = in;
         }
         
-        // 转换命令名为小写进行匹配
+        // 转换命令名为小写，建议无视他
         string cmd_lower = cmd_name;
         transform(cmd_lower.begin(), cmd_lower.end(), cmd_lower.begin(), ::tolower);
         
+        //帮助
         if(cmd_lower == "help" || cmd_lower == "h" || cmd_lower == "?"){
             cout << "fd-mod {name:\" \",des:\" \"}  --- to create a mod\n";
             cout << "fd-block {name:\" \",des:\" \",icon:\" \",explosion:\" \",light:\" \"}  --- to create a block\n";
@@ -89,13 +81,13 @@ int main(){
             break;
         }
         else if(cmd_lower == "fd-mod"){
-            // 检查参数
+            // 检查参数，看看有没有创建模组，不然会崩
             if(params.empty()){
                 cout << "Error: Please provide parameters. Usage: fd-mod {name:\"mod_name\",des:\"description\"}\n";
                 continue;
             }
             
-            // 传递参数给Python脚本
+            // 传参给Python脚本
             string full_cmd = "python3 \"" + py_path + "fd-mod.py\" " + params;
             FILE* pipe = popen(full_cmd.c_str(), "r");
             if(pipe){
@@ -106,7 +98,7 @@ int main(){
                 }
                 pclose(pipe);
                 
-                // 解析返回的mod名称
+                // 解析返回的mod名称，新建方块物品要用，放到变量里
                 size_t pos = result.find("name:");
                 if(pos != string::npos){
                     name = result.substr(pos + 5);
@@ -128,7 +120,7 @@ int main(){
                 continue;
             }
             
-            // 传递参数给Python脚本，添加mod名称
+            // 依旧传参
             string full_cmd = "python3 \"" + py_path + "fd-block.py\" " + params + ";name=" + name + ";";
             FILE* pipe = popen(full_cmd.c_str(), "r");
             if(pipe){
@@ -176,3 +168,4 @@ int main(){
     return 0;
 }
 
+//作者英文不好，输出的错误信息是先中文再AI帮忙翻译的哈

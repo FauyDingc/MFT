@@ -11,10 +11,9 @@ def _main_():
 
     par = sys.argv[1]
     size = len(par)
-
-    # 解析mod名称（从参数末尾获取）
+    #获取mod_name
     mod_name_Start = par.find("/;name=") + 7
-    if mod_name_Start == 6:  # 没有找到";name="
+    if mod_name_Start == 6:  # 奇怪的if
         print("Error: mod name not found in parameters!")
         return
 
@@ -24,10 +23,9 @@ def _main_():
             break
     mod_name = par[mod_name_Start:mod_nameEnd]
     print("mod name: " + mod_name)
-
-    # 解析物品名称
+    
     nameStart = par.find("name=\"") + 6
-    if nameStart == 5:  # 没有找到name="
+    if nameStart == 5:  # 没有找到参头
         print("Error: name parameter not found!")
         return
 
@@ -38,9 +36,8 @@ def _main_():
     name = par[nameStart:nameEnd]
     print("item name: " + name)
 
-    # 解析物品描述
     desStart = par.find("des=\"") + 5
-    if desStart == 4:  # 没有找到des="
+    if desStart == 4:  # 依旧没有找到
         print("Error: des parameter not found!")
         return
 
@@ -51,9 +48,9 @@ def _main_():
     des = par[desStart:desEnd]
     print("item des: " + des)
 
-    # 解析物品类型 (2d/3d)
+    # 2D物品还是3D物品(3D需要模型文件)
     typeStart = par.find("type=\"") + 6
-    if typeStart == 5:  # 没有找到type="
+    if typeStart == 5:  # 没有找到x3
         print("Error: type parameter not found! Use '2d' or '3d'")
         return
 
@@ -67,9 +64,8 @@ def _main_():
         return
     print("item type: " + item_type)
 
-    # 解析纹理/模型名称
     textureStart = par.find("texture=\"") + 9
-    if textureStart == 8:  # 没有找到texture="
+    if textureStart == 8:  # 没有找到......................x4
         print("Error: texture parameter not found!")
         return
 
@@ -80,7 +76,7 @@ def _main_():
     texture = par[textureStart:textureEnd]
     print("item texture/model: " + texture)
 
-    # 解析可选参数
+    # 可选参的初始定义
     edible = False
     edible_effect = ""
     hand_effect = ""
@@ -108,7 +104,6 @@ def _main_():
         hand_effect = par[handStart:handEnd]
         print("hand effect: " + hand_effect)
 
-    # 创建物品目录结构
     items_path = mod_name + "/items"
     textures_items_path = mod_name + "/textures/items"
     models_items_path = mod_name + "/models/items"
@@ -116,15 +111,14 @@ def _main_():
     try:
         os.makedirs(items_path, exist_ok=True)
         os.makedirs(textures_items_path, exist_ok=True)
-        # 确保models父目录存在
         os.makedirs(mod_name + "/models", exist_ok=True)
         if item_type == '3d':
             os.makedirs(models_items_path, exist_ok=True)
     except Exception as e:
-        print(f"Error creating directories: {e}")
+        print(f"Error creating directories: {e}")#父目录飞起来
         return
 
-    # 创建物品定义JSON文件
+    # 开始创建文件ing.................
     item_content = {
         "format_version": "1.16.0",
         "minecraft:item": {
@@ -143,7 +137,7 @@ def _main_():
         }
     }
 
-    # 添加可选组件
+    # 可选参数，后面追到文件里
     if edible:
         item_content["minecraft:item"]["components"]["minecraft:food"] = {
             "nutrition": 4,
@@ -172,10 +166,10 @@ def _main_():
             json.dump(item_content, file, indent=4, ensure_ascii=False)
         print("Item definition created successfully!")
     except Exception as e:
-        print(f"Error writing item definition: {e}")
+        print(f"Error writing item definition: {e}")#无可救药
         return
 
-    # 创建纹理JSON文件
+    # 继续创建文件ing...............x2
     if item_type == '2d':
         texture_content = f'''{{
     "resource_pack_name": "{mod_name}",
@@ -255,7 +249,7 @@ def _main_():
             print(f"Error writing 3D model: {e}")
             return
 
-    # 更新语言文件
+    # 追加语言文件
     try:
         with open(mod_name + "/texts/zh_CN.lang", "a", encoding='utf-8') as file:
             file.write(f"item.{mod_name}:{name}.name={name}\n")
@@ -270,3 +264,14 @@ def _main_():
 
 if __name__ == "__main__":
     _main_()
+
+
+
+
+
+
+
+
+
+
+#阿妈特拉丝

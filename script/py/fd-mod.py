@@ -9,16 +9,15 @@ def _main_():
         print("Error: No arguments provided!")
         return
     
-    # 在函数内部生成UUID，确保每次调用都生成新的UUID
+    # uuid4
     uuid1 = uuid.uuid4()
     uuid2 = uuid.uuid4()
     
     par = sys.argv[1]
     size = len(par)
     
-    # 解析mod名称
     nameStart = par.find("name=\"") + 6
-    if nameStart == 5:  # 没有找到name="
+    if nameStart == 5:  # 模组名->die
         print("Error: name parameter not found!")
         return
     
@@ -29,9 +28,8 @@ def _main_():
     name = par[nameStart:nameEnd]
     print("mod name: " + name)
     
-    # 解析mod描述
     desStart = par.find("des=\"") + 5
-    if desStart == 4:  # 没有找到des="
+    if desStart == 4:  # it is die too
         print("Error: des parameter not found!")
         return
     
@@ -42,7 +40,7 @@ def _main_():
     des = par[desStart:desEnd]
     print("mod des: " + des)
     
-    # 创建模组目录结构
+    # 必要的目录结构
     try:
         os.makedirs(name + "/textures/blocks", exist_ok=True)
         os.makedirs(name + "/textures/items", exist_ok=True)
@@ -56,7 +54,7 @@ def _main_():
         print(f"Error creating directories: {e}")
         return
     
-    # 创建manifest.json
+    # 创建manifest.json，形似身份证一样的东西，uuid唯一
     manifest_content = f'''{{
     "format_version": 2,
     "header": {{
@@ -89,7 +87,7 @@ def _main_():
         print(f"Error writing manifest.json: {e}")
         return
     
-    # 创建基础mod脚本
+    # 创建mod脚本，没有细写
     script_content = f'''// Mod: {name}
 // Description: {des}
 
@@ -104,7 +102,7 @@ console.log("Mod {name} loaded!");
         print(f"Error writing mod.js: {e}")
         return
     
-    # 创建初始语言文件
+    # 创建语言文件，游戏里有这个东西才能正确显示物品和方块的名称
     try:
         with open(name + "/texts/zh_CN.lang", "w", encoding='utf-8') as file:
             file.write(f"mod.name={name}\n")
