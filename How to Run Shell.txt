@@ -1,1 +1,3 @@
-cp MFTShell.elf /tmp/MFTShell.elf && chmod +x /tmp/MFTShell.elf && /tmp/MFTShell.elf
+只有单个文件时
+cp MFTShell.elf /tmp/MFTShell.elf && chmod +x /tmp/MFTShell.elf //只用一次即可
+/tmp/MFTShell.elf

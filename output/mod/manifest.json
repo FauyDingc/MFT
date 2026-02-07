@@ -1,0 +1,23 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "mod",
+        "description": "des",
+        "uuid": "01c1b759-752d-4bfc-ba26-29dee34abad2",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 14, 0]
+    }, 
+    "modules": [
+        {
+            "type": "script",
+            "entry": "scripts/mod.js",
+            "version": [1, 0, 0]
+        }
+    ],
+    "dependencies": [
+        {
+            "uuid": "02c0fc84-c12d-462d-81aa-f42d05dfac26",
+            "version": [1, 14, 0]
+        }
+    ]
+}

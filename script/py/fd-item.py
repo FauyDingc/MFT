@@ -4,149 +4,169 @@ import json
 
 sys.stdout.flush()
 
-def _main_():
-    print("Creating item...")
+def parse_params(params_str):
+    """解析参数字符串，返回字典"""
+    params = {}
+    if not params_str:
+        return params
+    
+    i = 0
+    length = len(params_str)
+    
+    while i < length:
+        # 跳过空白和逗号
+        while i < length and (params_str[i].isspace() or params_str[i] == ','):
+            i += 1
+        if i >= length:
+            break
+        
+        # 找等号
+        eq_pos = params_str.find('=', i)
+        if eq_pos == -1:
+            break
+        
+        key = params_str[i:eq_pos].strip()
+        i = eq_pos + 1
+        
+        # 跳过空白
+        while i < length and params_str[i].isspace():
+            i += 1
+        if i >= length:
+            break
+        
+        # 解析值
+        value = ""
+        if params_str[i] in ('"', "'"):
+            quote = params_str[i]
+            i += 1
+            while i < length:
+                # 处理转义字符
+                if params_str[i] == '\\' and i + 1 < length:
+                    next_char = params_str[i + 1]
+                    if next_char == 'n':
+                        value += '\n'
+                    elif next_char == 't':
+                        value += '\t'
+                    elif next_char == '"':
+                        value += '"'
+                    elif next_char == "'":
+                        value += "'"
+                    else:
+                        value += next_char
+                    i += 2
+                elif params_str[i] == quote:
+                    i += 1
+                    break
+                else:
+                    value += params_str[i]
+                    i += 1
+        else:
+            while i < length and params_str[i] not in ',;':
+                value += params_str[i]
+                i += 1
+        
+        if key:
+            params[key] = value.strip()
+    
+    return params
 
+
+def main():
+    print("Creating item...")
+    
     if len(sys.argv) < 2:
         print("Error: No arguments provided!")
         return
-
-    par = sys.argv[1]
-    size = len(par)
-    #获取mod_name
-    mod_name_Start = par.find("/;name=") + 7
-    if mod_name_Start == 6:  # 奇怪的if
-        print("Error: mod name not found in parameters!")
-        return
-
-    for j in range(mod_name_Start, size):
-        if par[j] == ';':
-            mod_nameEnd = j
-            break
-    mod_name = par[mod_name_Start:mod_nameEnd]
-    print("mod name: " + mod_name)
     
-    nameStart = par.find("name=\"") + 6
-    if nameStart == 5:  # 没有找到参头
-        print("Error: name parameter not found!")
+    params = parse_params(sys.argv[1])
+    
+    # 获取输出路径
+    out_path = params.get('out', 'output/')
+    if out_path and not out_path.endswith('/'):
+        out_path += '/'
+    print(f"Output path: {out_path}")
+    
+    # 获取模组名称
+    mod_name = params.get('name', '')
+    if not mod_name:
+        print("Error: 'name' parameter not found (mod_name)!")
         return
-
-    for j in range(nameStart, size):
-        if par[j] == '"':
-            nameEnd = j
-            break
-    name = par[nameStart:nameEnd]
-    print("item name: " + name)
-
-    desStart = par.find("des=\"") + 5
-    if desStart == 4:  # 依旧没有找到
-        print("Error: des parameter not found!")
+    print(f"Mod name: {mod_name}")
+    
+    # 获取物品名称
+    item_name = params.get('item', '')
+    if not item_name:
+        print("Error: 'item' parameter not found!")
         return
-
-    for j in range(desStart, size):
-        if par[j] == '"':
-            desEnd = j
-            break
-    des = par[desStart:desEnd]
-    print("item des: " + des)
-
-    # 2D物品还是3D物品(3D需要模型文件)
-    typeStart = par.find("type=\"") + 6
-    if typeStart == 5:  # 没有找到x3
-        print("Error: type parameter not found! Use '2d' or '3d'")
-        return
-
-    for j in range(typeStart, size):
-        if par[j] == '"':
-            typeEnd = j
-            break
-    item_type = par[typeStart:typeEnd].lower()
+    print(f"Item name: {item_name}")
+    
+    # 获取描述
+    des = params.get('des', '')
+    print(f"Item description: {des}")
+    
+    # 获取类型
+    item_type = params.get('type', '2d').lower()
     if item_type not in ['2d', '3d']:
         print("Error: type must be '2d' or '3d'")
         return
-    print("item type: " + item_type)
-
-    textureStart = par.find("texture=\"") + 9
-    if textureStart == 8:  # 没有找到......................x4
-        print("Error: texture parameter not found!")
-        return
-
-    for j in range(textureStart, size):
-        if par[j] == '"':
-            textureEnd = j
-            break
-    texture = par[textureStart:textureEnd]
-    print("item texture/model: " + texture)
-
-    # 可选参的初始定义
-    edible = False
-    edible_effect = ""
-    hand_effect = ""
-
-    # 检查是否可食用
-    if "edible=\"true\"" in par:
-        edible = True
-        # 解析食用效果
-        effectStart = par.find("effect=\"") + 8
-        if effectStart != 7:
-            for j in range(effectStart, size):
-                if par[j] == '"':
-                    effectEnd = j
-                    break
-            edible_effect = par[effectStart:effectEnd]
-            print("edible effect: " + edible_effect)
-
-    # 解析手持效果
-    handStart = par.find("hand=\"") + 6
-    if handStart != 5:
-        for j in range(handStart, size):
-            if par[j] == '"':
-                handEnd = j
-                break
-        hand_effect = par[handStart:handEnd]
-        print("hand effect: " + hand_effect)
-
-    items_path = mod_name + "/items"
-    textures_items_path = mod_name + "/textures/items"
-    models_items_path = mod_name + "/models/items"
-
+    print(f"Item type: {item_type}")
+    
+    # 获取纹理
+    texture = params.get('texture', '')
+    print(f"Item texture: {texture}")
+    
+    # 可选参数
+    edible = params.get('edible', 'false').lower() == 'true'
+    print(f"Edible: {edible}")
+    
+    edible_effect = params.get('effect', '')
+    if edible and edible_effect:
+        print(f"Edible effect: {edible_effect}")
+    
+    hand_effect = params.get('hand', '')
+    print(f"Hand effect: {hand_effect}")
+    
+    # 创建目录
+    mod_path = os.path.join(out_path, mod_name)
+    items_path = os.path.join(mod_path, 'items')
+    textures_items_path = os.path.join(mod_path, 'textures', 'items')
+    
     try:
         os.makedirs(items_path, exist_ok=True)
         os.makedirs(textures_items_path, exist_ok=True)
-        os.makedirs(mod_name + "/models", exist_ok=True)
+        os.makedirs(os.path.join(mod_path, 'models'), exist_ok=True)
         if item_type == '3d':
-            os.makedirs(models_items_path, exist_ok=True)
+            os.makedirs(os.path.join(mod_path, 'models', 'items'), exist_ok=True)
     except Exception as e:
-        print(f"Error creating directories: {e}")#父目录飞起来
+        print(f"Error creating directories: {e}")
         return
-
-    # 开始创建文件ing.................
-    item_content = {
+    
+    # 创建物品定义
+    item_data = {
         "format_version": "1.16.0",
         "minecraft:item": {
             "description": {
-                "identifier": f"{mod_name}:{name}",
+                "identifier": f"{mod_name}:{item_name}",
                 "category": "items"
             },
             "components": {
                 "minecraft:icon": {
-                    "texture": f"{name}"
+                    "texture": f"{item_name}"
                 },
                 "minecraft:display_name": {
-                    "value": f"item.{mod_name}:{name}.name"
+                    "value": f"item.{mod_name}:{item_name}.name"
                 }
             }
         }
     }
-
-    # 可选参数，后面追到文件里
+    
     if edible:
-        item_content["minecraft:item"]["components"]["minecraft:food"] = {
+        item_data["minecraft:item"]["components"]["minecraft:food"] = {
             "nutrition": 4,
             "saturation_modifier": "normal"
         }
         if edible_effect:
-            item_content["minecraft:item"]["components"]["minecraft:food"]["effects"] = [
+            item_data["minecraft:item"]["components"]["minecraft:food"]["effects"] = [
                 {
                     "name": edible_effect,
                     "chance": 1.0,
@@ -154,126 +174,116 @@ def _main_():
                     "amplifier": 0
                 }
             ]
-
+    
     if hand_effect:
-        item_content["minecraft:item"]["components"]["minecraft:hand_equipped"] = True
+        item_data["minecraft:item"]["components"]["minecraft:hand_equipped"] = True
         if hand_effect == "sword":
-            item_content["minecraft:item"]["components"]["minecraft:damage"] = 5
-            item_content["minecraft:item"]["components"]["minecraft:durability"] = {
+            item_data["minecraft:item"]["components"]["minecraft:damage"] = 5
+            item_data["minecraft:item"]["components"]["minecraft:durability"] = {
                 "max_durability": 1561
             }
-
+    
     try:
-        with open(items_path + "/" + name + ".json", "w", encoding='utf-8') as file:
-            json.dump(item_content, file, indent=4, ensure_ascii=False)
+        with open(os.path.join(items_path, item_name + ".json"), "w", encoding='utf-8') as f:
+            json.dump(item_data, f, indent=4, ensure_ascii=False)
         print("Item definition created successfully!")
     except Exception as e:
-        print(f"Error writing item definition: {e}")#无可救药
+        print(f"Error writing item definition: {e}")
         return
-
-    # 继续创建文件ing...............x2
+    
+    # 创建纹理JSON
     if item_type == '2d':
-        texture_content = f'''{{
-    "resource_pack_name": "{mod_name}",
+        texture_content = '''{
+    "resource_pack_name": "''' + mod_name + '''",
     "texture_name": "atlas.items",
-    "texture_data": {{
-        "{name}": {{
-            "textures": "textures/items/{texture}"
-        }}
-    }}
-}}'''
-    else:  # 3d
-        texture_content = f'''{{
-    "resource_pack_name": "{mod_name}",
+    "texture_data": {
+        "''' + item_name + '''": {
+            "textures": "textures/items/''' + texture + '''"
+        }
+    }
+}'''
+    else:
+        texture_content = '''{
+    "resource_pack_name": "''' + mod_name + '''",
     "texture_name": "atlas.items",
-    "texture_data": {{
-        "{name}": {{
-            "textures": {{
-                "up": "textures/items/{texture}_up",
-                "down": "textures/items/{texture}_down",
-                "north": "textures/items/{texture}_side",
-                "south": "textures/items/{texture}_side",
-                "east": "textures/items/{texture}_side",
-                "west": "textures/items/{texture}_side"
-            }}
-        }}
-    }}
-}}'''
-
+    "texture_data": {
+        "''' + item_name + '''": {
+            "textures": {
+                "up": "textures/items/''' + texture + '''_up",
+                "down": "textures/items/''' + texture + '''_down",
+                "north": "textures/items/''' + texture + '''_side",
+                "south": "textures/items/''' + texture + '''_side",
+                "east": "textures/items/''' + texture + '''_side",
+                "west": "textures/items/''' + texture + '''_side"
+            }
+        }
+    }
+}'''
+    
     try:
-        with open(textures_items_path + "/" + name + "_texture.json", "w") as file:
-            file.write(texture_content)
+        with open(os.path.join(textures_items_path, item_name + "_texture.json"), "w") as f:
+            f.write(texture_content)
         print("Texture JSON created successfully!")
     except Exception as e:
         print(f"Error writing texture JSON: {e}")
         return
-
+    
     # 如果是3D物品，创建模型文件
     if item_type == '3d':
-        model_content = f'''{{
+        model_content = '''{
     "format_version": "1.12.0",
     "minecraft:geometry": [
-        {{
-            "description": {{
-                "identifier": "geometry.{mod_name}.{name}",
+        {
+            "description": {
+                "identifier": "geometry.''' + mod_name + '''.''' + item_name + '''",
                 "texture_width": 32,
                 "texture_height": 32
-            }},
+            },
             "bones": [
-                {{
+                {
                     "name": "body",
                     "pivot": [0, 0, 0],
                     "cubes": [
-                        {{
+                        {
                             "origin": [-4, 0, -4],
                             "size": [8, 8, 8],
-                            "uv": {{
-                                "north": {{"uv": [0, 0], "uv_size": [8, 8]}},
-                                "east": {{"uv": [0, 0], "uv_size": [8, 8]}},
-                                "south": {{"uv": [0, 0], "uv_size": [8, 8]}},
-                                "west": {{"uv": [0, 0], "uv_size": [8, 8]}},
-                                "up": {{"uv": [0, 0], "uv_size": [8, 8]}},
-                                "down": {{"uv": [0, 0], "uv_size": [8, 8]}}
-                            }}
-                        }}
+                            "uv": {
+                                "north": {"uv": [0, 0], "uv_size": [8, 8]},
+                                "east": {"uv": [0, 0], "uv_size": [8, 8]},
+                                "south": {"uv": [0, 0], "uv_size": [8, 8]},
+                                "west": {"uv": [0, 0], "uv_size": [8, 8]},
+                                "up": {"uv": [0, 0], "uv_size": [8, 8]},
+                                "down": {"uv": [0, 0], "uv_size": [8, 8]}
+                            }
+                        }
                     ]
-                }}
+                }
             ]
-        }}
+        }
     ]
-}}'''
-
+}'''
         try:
-            with open(models_items_path + "/" + name + ".json", "w") as file:
-                file.write(model_content)
+            with open(os.path.join(mod_path, 'models', 'items', item_name + ".json"), "w") as f:
+                f.write(model_content)
             print("3D model created successfully!")
         except Exception as e:
             print(f"Error writing 3D model: {e}")
             return
-
-    # 追加语言文件
+    
+    # 更新语言文件
     try:
-        with open(mod_name + "/texts/zh_CN.lang", "a", encoding='utf-8') as file:
-            file.write(f"item.{mod_name}:{name}.name={name}\n")
+        with open(os.path.join(mod_path, "texts", "zh_CN.lang"), "a", encoding='utf-8') as f:
+            f.write(f"item.{mod_name}:{item_name}.name={item_name}\n")
             if des:
-                file.write(f"item.{mod_name}:{name}.desc={des}\n")
+                f.write(f"item.{mod_name}:{item_name}.desc={des}\n")
         print("Language file updated successfully!")
     except Exception as e:
         print(f"Error writing language file: {e}")
         return
-
+    
     print("Item creation completed!")
 
+
 if __name__ == "__main__":
-    _main_()
+    main()
 
-
-
-
-
-
-
-
-
-
-#阿妈特拉丝

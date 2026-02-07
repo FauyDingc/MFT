@@ -1,0 +1,9 @@
+- [ ] 修改ParameterParser::parse以解析--key "value"格式
+- [ ] 修改toArgString以构建--key "value"字符串
+- [ ] 更新handleFdMod、handleFdBlock、handleFdItem以正确构建参数
+- [ ] 将main.cpp中的所有错误消息翻译为中文
+- [ ] 更新help文本以反映新参数格式
+- [ ] 修改fd-mod.py使用argparse并翻译错误为中文
+- [ ] 修改fd-block.py使用argparse并翻译错误为中文
+- [ ] 修改fd-item.py使用argparse并翻译错误为中文
+- [ ] 测试更改
