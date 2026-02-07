@@ -23,22 +23,26 @@ string in;
 string name;
 
 int main(){
-    ios::sync_with_stdio(0);
-    cin.tie(0);
     
     string program_path = get_program_path();
     
     // --------
+    // 尝试多种相对路径找到Python脚本
     string py_path = program_path + "/../script/py/";
 
     if(access(py_path.c_str(), F_OK) != 0){
-        py_path = program_path + "/script/py/";
+        py_path = "./script/py/";
     }
     if(access(py_path.c_str(), F_OK) != 0){
-        py_path = program_path + "/../../script/py/";
+        py_path = "../script/py/";
     }
     if(access(py_path.c_str(), F_OK) != 0){
-        py_path = "/media/ljz/LJZ/MFT/script/py/";
+        py_path = program_path + "/../script/py/";
+    }
+    if(access(py_path.c_str(), F_OK) != 0){
+        cerr << "\033[31mError: Cannot find Python scripts directory!\033[0m\n";
+        cerr << "\033[31mSearched paths relative to program and current directory.\033[0m\n";
+        return 1;
     }
     // ---------看看py脚本在何处
 
@@ -46,8 +50,8 @@ int main(){
     cout << "\033[32mPython scripts path: " << py_path << "\033[0m\n";
     cout << "\033[32mType 'help' for help, type 'exit' to exit. Please create a mod first!\n\033[0m";
     cout << "notice:\n";
-    cout << "1. Icon do not add '.png'\n";
-    cout << "2. Put the texture file in the appropriate subfolders inside 'textures/*'\n\n";
+    cout << "   1. Icon do not add '.png'\n";
+    cout << "   2. Put the texture file in the appropriate subfolders inside 'textures/*'\n\n";
     
     while(true){
         cout << "\033[34mMFT> \033[0m";
@@ -75,10 +79,10 @@ int main(){
         
         //帮助
         if(cmd_lower == "help" || cmd_lower == "h" || cmd_lower == "?"){
-            cout << "fd-mod {name:\" \",des:\" \"}  --- to create a mod\n";
+            cout << "\nfd-mod {name:\" \",des:\" \"}  --- to create a mod\n";
             cout << "fd-block {name:\" \",des:\" \",icon:\" \",explosion:\" \",light:\" \"}  --- to create a block\n";
             cout << "fd-item {name:\" \",des:\" \",type:\"2d/3d\",texture:\" \",edible:\"true/false\",effect:\" \",hand:\" \"}  --- to create an item\n";
-            cout << "exit/quit  --- to exit the program\n";
+            cout << "exit/quit  --- to exit the program\n\n";
         }
         else if(cmd_lower == "exit" || cmd_lower == "quit"){
             cout<<'\n';//后面发现直接推出终端不会换行，加了一句
@@ -87,7 +91,7 @@ int main(){
         else if(cmd_lower == "fd-mod"){
             // 检查参数，看看有没有创建模组，不然会崩
             if(params.empty()){
-                cout << "Error: Please provide parameters. Usage: fd-mod {name:\"mod_name\",des:\"description\"}\n";
+                cout << "\033[31mError: Please provide parameters. Usage: fd-mod {name:\"mod_name\",des:\"description\"}\033[0m\n";
                 continue;
             }
             
@@ -109,18 +113,18 @@ int main(){
                     // 去除换行符和空格
                     name.erase(remove_if(name.begin(), name.end(), ::isspace), name.end());
                 }
-                cout << "Mod created successfully!\n";
+                cout << "Mod created successfully!\n";//nice
             } else {
-                cout << "Error: Failed to execute Python script!\n";
+                cout << "\033[31mError: Failed to execute Python script!\033[0m\n";
             }
         }
         else if(cmd_lower == "fd-block"){
             if(name.empty()){
-                cout << "Error: Please create a mod first using 'fd-mod' command!\n";
+                cout << "\033[31mError: Please create a mod first using 'fd-mod' command!\033[0m\n";
                 continue;
             }
             if(params.empty()){
-                cout << "Error: Please provide parameters. Usage: fd-block {name:\"block_name\",des:\"description\",icon:\"texture_name\"}\n";
+                cout << "\033[31mError: Please provide parameters. Usage: fd-block {name:\"block_name\",des:\"description\",icon:\"texture_name\"}\033[0m\n";
                 continue;
             }
             
@@ -136,16 +140,16 @@ int main(){
                 pclose(pipe);
                 cout << "Block created successfully!\n";
             } else {
-                cout << "Error: Failed to execute Python script!\n";
+                cout << "\033[31mError: Failed to execute Python script!\033[0m\n";
             }
         }
         else if(cmd_lower == "fd-item"){
             if(name.empty()){
-                cout << "Error: Please create a mod first using 'fd-mod' command!\n";
+                cout << "\033[31mError: Please create a mod first using 'fd-mod' command!\033[0m\n";
                 continue;
             }
             if(params.empty()){
-                cout << "Error: Please provide parameters. Usage: fd-item {name:\"item_name\",des:\"description\",type:\"2d/3d\",texture:\"texture_name\"}\n";
+                cout << "\033[31mError: Please provide parameters. Usage: fd-item {name:\"item_name\",des:\"description\",type:\"2d/3d\",texture:\"texture_name\"}\033[0m\n";
                 continue;
             }
             
@@ -161,15 +165,16 @@ int main(){
                 pclose(pipe);
                 cout << "Item created successfully!\n";
             } else {
-                cout << "Error: Failed to execute Python script!\n";
+                cout << "\033[31mError: Failed to execute Python script!\033[0m\n";
             }
         }
         else{
-            cout << "Unknown command: " << cmd_name << "\n";
-            cout << "Type 'help' for available commands.\n";
+            cout << "\033[31mUnknown command: " << cmd_name << "\033[0m\n";
+            cout << "\033[31mType 'help' for available commands.\033[0m\n";
         }
     }
     return 0;
 }
 
 //作者英文不好，输出的错误信息是先中文再AI帮忙翻译的哈
+
